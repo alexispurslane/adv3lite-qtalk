@@ -12,9 +12,10 @@ Before you do this, you would be well advised to understand the nature of your d
 
  1. If you don't already know the advantages of the standard TADS 3
     conversation system, you should consider them. Read about them here:
-         http://www.tads.org/howto/t3actor.htm
-         http://www.tads.org/howto/convbkg.htm
-         http://www.tads.org/howto/t3conv.htm
+
+    - http://www.tads.org/howto/t3actor.htm
+    - http://www.tads.org/howto/convbkg.htm
+    - http://www.tads.org/howto/t3conv.htm
 
  2. If you still want to use conversation menus, please check out
     Soren J. Lovborg's convmenu.t. Lovborg's system is both menu-based 
