@@ -126,6 +126,7 @@ Each conversation menu option &emdash; each quip &emdash; can contain any of the
 following elements:
 
 | Element                     | Description                                                                                                                                    |
+|-----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
 | `quipID`                    | The quip's identifier                                                                                                                          |
 | `Quip` or `QMain` or `QSub` | The quip's class.                                                                                                                              |
 | `desc`                      | A double-quoted string or method holding the quip's "short description" &emdash; i.e., how it is shown in a list of conversation menu options. |
