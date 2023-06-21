@@ -1,10 +1,13 @@
 # Menu-based conversations for adv3Lite
-## Based on the qtalk library by Greg Boettcher
 
-The original can be found [here](https://unbox.ifarchive.org/?url=/if-archive/programming/tads3/library/contributions/qtalk.zip).
+Based on the qtalk library by Greg Boettcher, which can be found [here](https://unbox.ifarchive.org/?url=/if-archive/programming/tads3/library/contributions/qtalk.zip).
 
 The following documentation is copied from the `qtalk.t` source file and
-formatted:
+formatted.
+
+------------------------------------------------------------------------
+
+## Introduction and alternatives
 
 Qtalk.t can be used in conjunction with Qtalkverbs.t to completely replace the standard TADS 3 conversation system.
 
@@ -23,8 +26,7 @@ Before you do this, you would be well advised to understand the nature of your d
     conversation system. It works well for the type of conversation 
     menus found in games such as _City of Secrets_ or _Max Blaster
     and Doris De Lightning Against the Parrot Creatures of Venus_. 
-    Find convmenu.t at:
-         http://kwi.homepage.dk/t3/convmenu.htm
+    Find convmenu.t at: http://kwi.homepage.dk/t3/convmenu.htm
 
  3. If convmenu.t doesn't appeal to you either, it could be that you 
     want the conversation menu options to appear in the same window as 
@@ -47,35 +49,10 @@ With that out of the way, let's move on.
 
 ------------------------------------------------------------------------
 
-ACKNOWLEDGMENTS:
+# How to use this library
 
-I'd like to thank the many people whose efforts helped me to produce 
-this extension.
-
-Qtalk.t is a TADS 3 port of Gtalk.h for Inform 6. So I am also thanking
-the people who helped with Gtalk.h.
-
-Thanks to:
-
-  Steve Breslin, who looked over the new TADS 3 version of this file
-    and gave quite a few helpful suggestions.
-  Krister Fundin and Mark J. Tilford, who both added to and 
-    substantially improved Gtalk.h for Inform 6. This library is,
-    after all, a TADS 3 port of Gtalk.h.
-  Roger Firth, Krister Fundin, Victor Gijsbers, Cedric Knight, Andrew 
-    Plotkin, and J. Robinson Wheeler, who gave various suggestions, 
-    feedback, example code, etc., that helped me when I worked on 
-    Gtalk.h for Inform.
-  David Glasser and Adam Cadre, whose Inform 6 extension phtalkoo.h
-    gave me a starting point for Gtalk.h, and hence for this extension
-    too.
-
-------------------------------------------------------------------------
-
-HOW TO USE THIS LIBRARY:
-
-These instructions assume you'll be using qtalk.t for conversation 
-menus. If you want to use qtalk.t to create *non-conversation* menus --
+These instructions assume you'll be using `qtalk.t` for conversation 
+menus. If you want to use `qtalk.t` to create *non-conversation* menus --
 well, then just read the instructions below and modify them to suit
 your purposes.
 
@@ -89,131 +66,122 @@ your purposes.
     worthwhile to consult qtalkverbs.t and either modify it or use it 
     as a reference for your own verb code.
  3. In your source files, for every case where you want to initiate a 
-    qtalk.t-style menu, you must call the select() method of a 
-    conversation object (concerning such objects, see the next step). 
-    If you are dealing with conversation verbs in the manner defined
-    qtalkverbs.t, then for every non-player character in your game, 
+    qtalk.t-style menu, you must call the `select()` method of a 
+    conversation object (more about these next). 
+
+    If you are dealing with conversation verbs in the manner defined in
+    `qtalkverbs.t`, then for every non-player character in your game, 
     you'll probably do something like this:
-         somebody: Actor
-           ...
-           dobjFor(TalkTo)
-           {
-             action()
-             {
-               somebodyMainMenu.select();
-             }
-           }
-         ;
+
+    ```tads3
+     somebody: Actor
+        ...
+        dobjFor(TalkTo)
+        {
+            action()
+            {
+                somebodyMainMenu.select();
+            }
+        }
+     ;
+     ```
+
  4. The next step is to create a series of objects, where each object
     represents a conversation menu option. Each of these objects must be 
-    of class Quip (or else a subclass thereof, namely QMain or QSub). 
- 5. Each conversation menu option -- each quip -- can contain any of the
+    of class `Quip` (or else a subclass thereof, namely `QMain` or `QSub`). 
+
+ 5. Each conversation menu option &emdash; each quip &emdash; can contain any of the
     following elements:
-      *  quipID:                   The quip's identifier.
-      *    Quip OR QMain OR QSub   The quip's class:
-                                     Quip  = regular quip
-                                     QMain = main menu quip
-                                     QSub  = submenu quip
-      *    desc = "double-quoted   The quip's "short description" -- 
-                     string"         i.e., how it is shown in a list of 
-            OR                       conversation menu options.
-           desc
-           {
-             method;
-           }
-      *    reply = "double-quoted  The response given when this quip is
-                     string"         selected, including a textual 
-            OR                       response, and perhaps also including 
-           reply                     additional programming statements.
-           {
-             method;
-           }
-      *    isOn  = true [DEFAULT]  Quip is turned on from the beginning
-                                     of the game.
-                 = nil             Quip is turned off from the beginning
-                                     of the game.
-      *    killZ = true            Disallow the "0 to say nothing"
-                                     option.
-                 = nil  [DEFAULT]  Allow the "0 to say nothing" option.
-      *    killQ = true            After this quip, don't ever say "What
-                                     would you like to say?"
-                 = nil  [DEFAULT]  After this quip, say "What would you
-                                     like to say?" if applicable.
-      *    qOn  = [quip1, quip2]   Turn the specified quips on.
-      *    qOff = [quip1, quip2]   Turn the specified quips off.
-      *    qOffSelf = true         Automatically turn off this quip 
-                                     after finishing with it.
-                   = nil [DEFAULT] Don't automatically turn off this 
-                                     quip after finishing with it.
-      *    options =               Provide a menu consisting of the
-             [list of quips]         following options.
-      *    transfer = quipID       "Go back to the main menu" or any 
-                                     other previously defined set of 
-                                     options.
-      *    zeroOption = quipID     Do this if you want to do something 
-                                     special when the player types
-                                     0 to say nothing.
-      *    [And there are also a number of message properties that
-           you can override if needed; see the code below.]
-         ;
- 6. Here is a sample quip, or conversation menu option:
-         quip20: Quip
-           desc = "<q>Could I have that apple?</q> "
-           reply {
-             "<q>Sure, why not.</q> She hands you the apple. <q>Say, 
-               you're not from around here, are you?</q> ";
-             apple.moveInto(me);
-           }
-           isOn = true
-           qOn = [quip21, quip22]
-           qOff = [quip20]
-           options = [quip21, quip22] 
-         ;
+
+    | Element                     | Description                                                                                                                                    |
+    | `quipID`                    | The quip's identifier                                                                                                                          |
+    | `Quip` or `QMain` or `QSub` | The quip's class.                                                                                                                              |
+    | `desc`                      | A double-quoted string or method holding the quip's "short description" &emdash; i.e., how it is shown in a list of conversation menu options. |
+    | `reply`                     | The double-quoted string or method with the response given by the NPC that holds these dialogue choices when this choice is chosen.            |
+    | `isOn`                      | `true` by default. Whether the quip starts visible in the menu or not                                                                          |
+    | `killZ`                     | `nil` by default. Disallow the "0 to say nothing" option                                                                                       |
+    | `killQ`                     | `nil` by default. After this quip, don't ever say "What would you like to say?" again.                                                         |
+    | `qOn`                       | List of quips to turn on after this dialogue option is chosen.                                                                                 |
+    | `qOff`                      | Same as above, but turns them off.                                                                                                             |
+    | `qOffSelf`                  | Automatically turn off this quip after finishing it. Defaults to `nil`                                                                         |
+    | `options`                   | Provide a menu consisting of the following options after this piece of dialogue.                                                               |
+    | `transfer`                  | Transfer control to some other Quip (for instance the main menu) after completing this dialogue.                                               |
+    | `zeroOption`                | Method or double-quoted string to use when the user chooses the "say nothing" option                                                           |
+    | Misc. message properties    | These can be overridden to change the default messages                                                                                         |
+
+  6. Here is a sample quip, or conversation menu option:
+  ```tads3
+    quip20: Quip
+        desc = "<q>Could I have that apple?</q> "
+        reply {
+            "<q>Sure, why not.</q> She hands you the apple. <q>Say, 
+            you're not from around here, are you?</q> ";
+            apple.moveInto(me);
+        }
+        isOn = true
+        qOn = [quip21, quip22]
+        qOff = [quip20]
+        options = [quip21, quip22] 
+    ;
+  ```
     In this example, quip21 and quip22 represent responses to the 
     question "You're not from around here, are you?" The rest of this
     quip shouldn't be terribly hard to figure it out if you look through
     all the documentation here and study qtalkdemo.t as needed. 
+
  7. Each set of quips must have (at least) one quip that represents the 
     "main menu." This main menu quip should be of class QMain. (To find 
     out why, read Note #2 below.) This "main menu" quip need not have a 
     desc property or a reply property, but it should have an options 
     property, which should consist of a list of other quips. In 
-    qtalkdemo.t, the main menu quip is called gbMain.
+    `qtalkdemo.t`, the main menu quip is called gbMain.
+
  8. If you investigate qtalkdemo.t, you will find that it contains 
     submenus (represented by the objects gbSubPeople, gbSubPlaces, and 
     gbSubFeatures). If you want to include such submenus, then they
     should belong to class QSub.
+
  9. Each quip has a select() routine. To put your conversation menu
     into action, call the select() routine of your "main menu" object, 
     as shown in Step 3 above.
+
 10. It's unlikely that you'll want the choices in your conversation 
     menus to always remain the same forever. Turning them on or off 
-    is easy: just use the statement "quip1.isOn = true;" or 
-    "quip1.isOn = nil;". There is a shortcut for this when you want to 
+    is easy: just use the statement `quip1.isOn = true;` or 
+    `quip1.isOn = nil;`. There is a shortcut for this when you want to 
     do it during the execution of a quip's reply method. Simply use
-    the properties qOn, qOff, and/or qOffSelf, as shown in Step 5 above. 
+    the properties `qOn`, `qOff`, and/or `qOffSelf`, as shown in Step 5 above. 
     The value of qOn or qOff should be a list containing quips to 
-    turn on or off, while the value of qOffSelf should be either true
+    turn on or off, while the value of `qOffSelf` should be either true
     or nil, depending on whether you want any given quip to turn itself
-    off after it's been selected. See Qtalkdemo.t for examples.
-11. If you want to save a bit of typing, you can make use of Qtalk.h, 
+    off after it's been selected. See qtalkdemo.t for examples.
+
+11. If you want to save a bit of typing, you can make use of `qtalk.h`, 
     which defines a template so that your quips usually won't need
     to contain "desc =" or "reply =". You can see the result in 
-    Qtalkdemo.t. There are three ways to do this:
-    (a) Include Qtalk.h in your *.t3m file (with the other *.h files).
+    `qtalkdemo.t`. There are three ways to do this:
+
+    - Include Qtalk.h in your *.t3m file (with the other *.h files).
         At the beginning of your source files, put:
-           #include <qtalk.h>
-    (b) At the beginning of your source files, put:
-           #include "qtalk.h"
+        ```tads3
+        #include <qtalk.h>
+        ```
+    - At the beginning of your source files, put:
+        ```tads3
+        #include "qtalk.h"
+        ```
         (This way it should not be necessary to put Qtalk.h into your
         .t3m file.)
-    (c) Or, at the beginning of your source files, put:
-           Quip template "desc"? "reply"?;
+    - Or, at the beginning of your source files, put:
+        ```tads3
+        Quip template "desc"? "reply"?;
+        ```
         This one line is the entire content of Qtalk.h. Since this is
         just as concise as typing an #include directive, some people
         may prefer to do it this way. Note that you must do one of 
         these three things for *each* of your source files that are
         to contain quips.
+
 11. Qtalk.t does not deal with any verb issues. That is dealt with by 
     Qtalkverbs.t instead. Basically, Qtalkverbs.t disables the verbs 
     ASK (both "ask about" and "ask for"), TELL, HELLO, GOODBYE, YES, NO, 
@@ -224,7 +192,8 @@ your purposes.
     this verb/action behavior, simply include Qtalkverbs.t in your *.t3m
     project file. Of course, you can always modify Qtalkverbs.t if
     you want, or replace it with something else.
-12. See also the following notes -- especially Note #1 to decide
+
+12. See also the following notes &emdash; especially Note #1 to decide
     if you want to use the "AutoDeactivate" feature.
 
 Note #1: Gtalk.h has an optional feature where it can routinely look
@@ -259,3 +228,30 @@ errors if you included qtalk.t in your project and then compiled for
 release. I was wrong about this. Although I did have such problems, 
 they were apparently caused by a bad sector of my hard drive, not by 
 any bug in qtalk.t.
+
+------------------------------------------------------------------------
+
+ACKNOWLEDGMENTS:
+
+I'd like to thank the many people whose efforts helped me to produce 
+this extension.
+
+Qtalk.t is a TADS 3 port of Gtalk.h for Inform 6. So I am also thanking
+the people who helped with Gtalk.h.
+
+Thanks to:
+
+  Steve Breslin, who looked over the new TADS 3 version of this file
+    and gave quite a few helpful suggestions.
+  Krister Fundin and Mark J. Tilford, who both added to and 
+    substantially improved Gtalk.h for Inform 6. This library is,
+    after all, a TADS 3 port of Gtalk.h.
+  Roger Firth, Krister Fundin, Victor Gijsbers, Cedric Knight, Andrew 
+    Plotkin, and J. Robinson Wheeler, who gave various suggestions, 
+    feedback, example code, etc., that helped me when I worked on 
+    Gtalk.h for Inform.
+  David Glasser and Adam Cadre, whose Inform 6 extension phtalkoo.h
+    gave me a starting point for Gtalk.h, and hence for this extension
+    too.
+
+
